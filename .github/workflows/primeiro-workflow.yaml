@@ -1,22 +1,27 @@
-name: primeiro-workflow # nome tecnico
-run-name: Meu Primeiro Workflow # nome descritivo
+name: Build
 
-# on: [push] 
- 
-on: # evento 
-    push:
-        branches:
-             - main
+on:
+  push:
+    branches:
+      - main
+
 
 jobs:
-    mac:
-        runs-on: macos-latest
-        steps:
-            - name: Rodar um hello no mac
-              run: echo "hello word"
-
-    linux:
-        runs-on: ubuntu-latest
-        steps: 
-            - name: Rodar um hello no linux
-              run: echo "hello word"
+  build:
+    name: Build and analyze
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+      - uses: SonarSource/sonarqube-scan-action@v6
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      # If you wish to fail your job when the Quality Gate is red, uncomment the
+      # following lines. This would typically be used to fail a deployment.
+      # - uses: SonarSource/sonarqube-quality-gate-action@v1
+      #   timeout-minutes: 5
+      #   env:
+      #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
